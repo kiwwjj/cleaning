@@ -1,0 +1,865 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "User and Service Management API",
+    "version": "1.0.0",
+    "description": "API for managing users, services, reviews, and orders."
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  },
+  "security": [
+    { "bearerAuth": [] }
+  ],
+  "paths": {
+    "/auth/login": {
+    "post": {
+      "summary": "User login. Roles: all",
+      "tags": ["Authentication"],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "email": { "type": "string", "format": "email", "description": "User's email address" },
+                "password": { "type": "string", "description": "User's password" }
+              },
+              "required": ["email", "password"]
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Successful login",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": { "type": "string" },
+                  "accessToken": { "type": "string", "description": "JWT token for user authentication" }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Invalid email or password"
+        },
+        "500": {
+          "description": "Server error"
+        }
+      }
+    }
+  },
+  "/auth/register": {
+    "post": {
+      "summary": "Register a new user. Roles: all",
+      "tags": ["Authentication"],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string", "description": "User's full name" },
+                "email": { "type": "string", "format": "email", "description": "User's email address" },
+                "password": { "type": "string", "description": "User's password" }
+              },
+              "required": ["name", "email", "password"]
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "User successfully registered",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Validation error or email already in use"
+        },
+        "500": {
+          "description": "Server error"
+        }
+      }
+    }
+  },
+    "/users": {
+      "get": {
+        "summary": "Retrieve all users. Roles: Admin",
+        "tags": ["Users"],
+        "responses": {
+          "200": {
+            "description": "List of users",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "user_id": { "type": "integer" },
+                      "name": { "type": "string" },
+                      "email": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new user. Roles: Admin",
+        "tags": ["Users"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "password": { "type": "string" },
+                  "email": { "type": "string" }
+                },
+                "required": ["name", "email", "password"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "email": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to create user"
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Retrieve a user by ID. Roles: Admin",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the user to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": { "type": "integer" },
+                    "name": { "type": "string" },
+                    "email": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a user. Roles: Admin",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the user to update"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string" },
+                  "email": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "user_id": { "type": "integer" },
+                    "name": { "type": "string" },
+                    "email": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user. Roles: Admin",
+        "tags": ["Users"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the user to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User deleted"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          }
+        }
+      }
+    },
+"/services": {
+    "get": {
+      "summary": "Retrieve all services. Roles: All",
+      "tags": ["Services"],
+      "responses": {
+        "200": {
+          "description": "List of all services",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "service_id": { "type": "integer" },
+                    "name": { "type": "string" },
+                    "description": { "type": "string" },
+                    "price": { "type": "number" },
+                    "price_per_square_meter": { "type": "number" },
+                    "additional_options": { "type": "string" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "post": {
+      "summary": "Create a new service. Roles: Admin",
+      "tags": ["Services"],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "price": { "type": "number" },
+                "price_per_square_meter": { "type": "number" },
+                "additional_options": { "type": "string" }
+              },
+              "required": ["name", "price", "price_per_square_meter", "additional_options"]
+            }
+          }
+        }
+      },
+      "responses": {
+        "201": {
+          "description": "Service created",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service_id": { "type": "integer" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "price": { "type": "number" },
+                  "price_per_square_meter": { "type": "number" },
+                  "additional_options": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "500": {
+          "description": "Failed to create service"
+        }
+      }
+    }
+  },
+  "/services/{id}": {
+    "get": {
+      "summary": "Retrieve a service by ID. Roles: All",
+      "tags": ["Services"],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          },
+          "description": "ID of the service to retrieve"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Service details",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service_id": { "type": "integer" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "price": { "type": "number" },
+                  "price_per_square_meter": { "type": "number" },
+                  "additional_options": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Service not found"
+        },
+        "400": {
+          "description": "Invalid ID supplied"
+        }
+      }
+    },
+    "patch": {
+      "summary": "Update a service. Roles: Admin",
+      "tags": ["Services"],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          },
+          "description": "ID of the service to update"
+        }
+      ],
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "price": { "type": "number" },
+                "price_per_square_meter": { "type": "number" },
+                "additional_options": { "type": "string" }
+              }
+            }
+          }
+        }
+      },
+      "responses": {
+        "200": {
+          "description": "Service updated",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service_id": { "type": "integer" },
+                  "name": { "type": "string" },
+                  "description": { "type": "string" },
+                  "price": { "type": "number" },
+                  "price_per_square_meter": { "type": "number" },
+                  "additional_options": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Service not found"
+        },
+        "400": {
+          "description": "Invalid ID supplied"
+        }
+      }
+    },
+    "delete": {
+      "summary": "Delete a service. Roles: Admin",
+      "tags": ["Services"],
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          },
+          "description": "ID of the service to delete"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Service deleted"
+        },
+        "400": {
+          "description": "Invalid ID supplied"
+        }
+      }
+    }
+  },
+    "/reviews": {
+      "get": {
+        "summary": "Retrieve all reviews. Roles: All",
+        "tags": ["Reviews"],
+        "responses": {
+          "200": {
+            "description": "List of all reviews",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "review_id": { "type": "integer" },
+                      "user_id": { "type": "integer" },
+                      "order_id": { "type": "integer" },
+                      "rating": { "type": "integer" },
+                      "comment": { "type": "string" },
+                      "created_at": { "type": "string", "format": "date-time" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new review. Roles: All",
+        "tags": ["Reviews"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": { "type": "integer" },
+                  "order_id": { "type": "integer" },
+                  "rating": { "type": "integer" },
+                  "comment": { "type": "string" }
+                },
+                "required": ["user_id", "order_id", "rating"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Review created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "review_id": { "type": "integer" },
+                    "user_id": { "type": "integer" },
+                    "order_id": { "type": "integer" },
+                    "rating": { "type": "integer" },
+                    "comment": { "type": "string" },
+                    "created_at": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to create review"
+          }
+        }
+      }
+    },
+    "/reviews/{id}": {
+      "get": {
+        "summary": "Retrieve a review by ID. Roles: All",
+        "tags": ["Reviews"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the review to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Review details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "review_id": { "type": "integer" },
+                    "user_id": { "type": "integer" },
+                    "order_id": { "type": "integer" },
+                    "rating": { "type": "integer" },
+                    "comment": { "type": "string" },
+                    "created_at": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Review not found"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a review. Roles: Admin",
+        "tags": ["Reviews"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the review to update"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "rating": { "type": "integer" },
+                  "comment": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Review updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "review_id": { "type": "integer" },
+                    "user_id": { "type": "integer" },
+                    "order_id": { "type": "integer" },
+                    "rating": { "type": "integer" },
+                    "comment": { "type": "string" },
+                    "created_at": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Review not found"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a review. Roles: Admin",
+        "tags": ["Reviews"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the review to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Review deleted"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "summary": "Retrieve all orders. Roles: Admin (all orders), User (only our own)",
+        "tags": ["Orders"],
+        "responses": {
+          "200": {
+            "description": "List of orders",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "order_id": { "type": "integer" },
+                      "user_id": { "type": "integer" },
+                      "service_id": { "type": "integer" },
+                      "status": { "type": "string" },
+                      "total_price": { "type": "number" },
+                      "created_at": { "type": "string", "format": "date-time" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new order. Roles: All",
+        "tags": ["Orders"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "user_id": { "type": "integer" },
+                  "service_id": { "type": "integer" },
+                  "status": { "type": "string" },
+                  "total_price": { "type": "number" }
+                },
+                "required": ["user_id", "service_id", "status", "total_price"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Order created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "order_id": { "type": "integer" },
+                    "user_id": { "type": "integer" },
+                    "service_id": { "type": "integer" },
+                    "status": { "type": "string" },
+                    "total_price": { "type": "number" },
+                    "created_at": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to create order"
+          }
+        }
+      }
+    },
+    "/orders/{id}": {
+      "get": {
+        "summary": "Retrieve an order by ID. Roles: Admin (all orders), User (only our own)",
+        "tags": ["Orders"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the order to retrieve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "order_id": { "type": "integer" },
+                    "user_id": { "type": "integer" },
+                    "service_id": { "type": "integer" },
+                    "status": { "type": "string" },
+                    "total_price": { "type": "number" },
+                    "created_at": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update an order. Roles: Admin",
+        "tags": ["Orders"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the order to update"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "status": { "type": "string" },
+                  "total_price": { "type": "number" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Order updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "order_id": { "type": "integer" },
+                    "user_id": { "type": "integer" },
+                    "service_id": { "type": "integer" },
+                    "status": { "type": "string" },
+                    "total_price": { "type": "number" },
+                    "created_at": { "type": "string", "format": "date-time" }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Order not found"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an order. Roles: Admin",
+        "tags": ["Orders"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID of the order to delete"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Order deleted"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          }
+        }
+      }
+    }
+  }
+}
