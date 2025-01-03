@@ -18,7 +18,7 @@ export class UsersController {
       return response.status(400).json({message: `Incorrect id ${id}`})
     }
   
-    const user = await usersService.findById(id);
+    const user = await this.usersService.findById(id);
   
     if (!user) {
       return response.status(404).json({message: `Not found`})
@@ -29,7 +29,7 @@ export class UsersController {
 
   async create(request, response) {
     try {
-      const createdUser = await usersService.create(request.body)
+      const createdUser = await this.usersService.create(request.body)
   
       response.status(201).json({name: createdUser.name, email: createdUser.email})
     } catch (err) {
@@ -45,7 +45,7 @@ export class UsersController {
       return response.status(400).json({message: `Incorrect id ${id}`})
     }
   
-    const updated = await usersService.update(id, request.body);
+    const updated = await this.usersService.update(id, request.body);
   
     if (!updated) {
       return response.status(404).json({message: `Not found`})
@@ -60,7 +60,7 @@ export class UsersController {
       return response.status(400).json({message: `Incorrect id ${id}`})
     }
   
-    await usersService.delete(id);
+    await this.usersService.delete(id);
   
     response.status(200).json()
   }
