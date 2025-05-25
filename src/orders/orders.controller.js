@@ -1,8 +1,10 @@
+import { ServicesService } from "../services/services.service.js";
 import { OrdersService } from "./orders.service.js";
 
 export class OrdersController {
   constructor() {
     this.ordersService = new OrdersService();
+    this.servicesService = new ServicesService();
   }
 
   async getAll(request, response) {
@@ -39,7 +41,15 @@ export class OrdersController {
 
   async create(request, response) {
     try {
-      const createdOrder = await this.ordersService.create(request.body)
+      const service = await this.servicesService.findById(request.body.service_id);
+
+      if (!service) {
+        return response.status(400).json({message: 'Incorrect service_id'})
+      }
+
+      const userId = request.user.id;
+
+      const createdOrder = await this.ordersService.create(request.body, service, userId)
   
       response.status(201).json(createdOrder)
     } catch (err) {

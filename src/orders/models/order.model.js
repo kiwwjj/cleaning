@@ -35,4 +35,8 @@ Order.init({
   status: {
     type: DataTypes.TEXT,
   },
+  totalPrice: {
+    type: DataTypes.NUMERIC(10, 2),
+    allowNull: false,
+  },
 }, { sequelize, modelName: 'Order', tableName: 'Order', timestamps: false });

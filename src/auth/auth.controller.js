@@ -47,8 +47,7 @@ export class AuthController {
     try {
       const {name, email, password} = request.body;
   
-      const hashedPassword = await bcrypt.hash(password, 10)
-      const createdUser = await this.usersService.create({name, email, password: hashedPassword, role: 'Client'})
+      const createdUser = await this.usersService.create({name, email, password, role: 'Client'})
   
       response.status(201).json({name: createdUser.name, email: createdUser.email})
     } catch (err) {

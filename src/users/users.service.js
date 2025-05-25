@@ -19,6 +19,13 @@ export class UsersService extends BaseService {
     return User.findOne({ where: { email: email } })
   }
 
+  async create(createUserInput) {
+    const {name, email, password} = createUserInput;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    return super.create({name, email, password: hashedPassword})
+  }
+
   async update(id, updateUserInput) {
     return super.update(id, updateUserInput, {attributes: {exclude: 'password'}})
   }

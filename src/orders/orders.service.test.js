@@ -12,7 +12,8 @@ describe('Orders test', () => {
           id: expect.any(Number),
           user_id: expect.any(Number),
           order_date: expect.any(Date),
-          status: expect.any(String)
+          status: expect.any(String),
+          totalPrice: expect.any(Number),
         })
       ])
     )

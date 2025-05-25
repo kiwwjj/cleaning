@@ -9,17 +9,16 @@ const ordersController = new OrdersController();
 export const router = express.Router()
 
 const createOrderValidationSchema = Joi.object({
-  user_id: Joi.number().required(),
   service_id: Joi.number().required(),
   order_date: Joi.date().required(),
-  status: Joi.string().required()
+  status: Joi.string().required(),
+  squares: Joi.number().positive()
 })
 
 const updateOrderValidationSchema = Joi.object({
-  user_id: Joi.number(),
   service_id: Joi.number(),
   order_date: Joi.date(),
-  status: Joi.string()
+  status: Joi.string(),
 })
 
 router.get('/', async (request, response) => ordersController.getAll(request, response))

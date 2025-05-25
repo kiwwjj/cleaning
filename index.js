@@ -2,7 +2,7 @@ import express from 'express'
 import dotenv from 'dotenv'
 import passport from 'passport'
 import swaggerUi from 'swagger-ui-express';
-import swaggerDocument from './swagger.json' assert {type: 'json'}
+import swaggerDocument from './swagger.json' with {type: 'json'}
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import crypto from 'crypto'
@@ -25,12 +25,12 @@ const port = 3000
 
 const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/logs';
 
-mongoose.connect(mongoUri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => console.log('Connected to MongoDB for logging.'))
-  .catch(err => console.error('Error connecting to MongoDB:', err));
+// mongoose.connect(mongoUri, {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// })
+//   .then(() => console.log('Connected to MongoDB for logging.'))
+//   .catch(err => console.error('Error connecting to MongoDB:', err));
 
 morgan.token('response-time-ms', (req, res) => {
   const diff = process.hrtime(req._startAt);
@@ -46,7 +46,7 @@ app.use(morgan((tokens, req, res) => {
     timestamp: new Date(),
   };
   
-  HttpLog.create(log).catch(err => console.error('Failed to save HTTP log:', err));
+  // HttpLog.create(log).catch(err => console.error('Failed to save HTTP log:', err));
   
   return JSON.stringify(log); // Optionally log to console
 }));
