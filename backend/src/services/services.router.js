@@ -10,10 +10,10 @@ const servicesController = new ServicesController()
 
 const createServiceValidationSchema = Joi.object({
   name: Joi.string().required(),
-  description: Joi.string(),
+  description: Joi.string().required(),
   price: Joi.number().positive().required(),
-  price_per_square_meter: Joi.number().positive().required(),
-  additional_options: Joi.string().required()
+  price_per_square_meter: Joi.number().positive(),
+  additional_options: Joi.string()
 })
 
 const updateServiceValidationSchema = Joi.object({

@@ -23,8 +23,8 @@ export interface CreateServiceInput {
   name: string;
   description?: string;
   price: number;
-  price_per_square_meter: number;
-  additional_options: string;
+  price_per_square_meter?: number;
+  additional_options?: string;
 }
 
 export interface UpdateServiceInput extends Partial<CreateServiceInput> {}

@@ -77,8 +77,15 @@ export default function Services() {
   });
 
   const handleCreate = (data: CreateServiceInput | UpdateServiceInput) => {
-    if ('name' in data && 'price' in data && 'price_per_square_meter' in data && 'additional_options' in data) {
-      createMutation.mutate(data as CreateServiceInput);
+    if ('name' in data && 'price' in data) {
+      const createData = { ...data } as CreateServiceInput;
+      if (!createData.additional_options?.trim()) {
+        createData.additional_options = undefined;
+      }
+      if (!createData.price_per_square_meter) {
+        createData.price_per_square_meter = undefined;
+      }
+      createMutation.mutate(createData);
     }
   };
 
@@ -140,7 +147,7 @@ export default function Services() {
                   <TableCell>{service.name}</TableCell>
                   <TableCell>{service.description}</TableCell>
                   <TableCell>${service.price}</TableCell>
-                  <TableCell>${service.price_per_square_meter}/m²</TableCell>
+                  <TableCell>{service.price_per_square_meter ? `$${service.price_per_square_meter}/m²` : '-'}</TableCell>
                   <TableCell>{service.additional_options}</TableCell>
                   <TableCell align="right">
                     <IconButton
@@ -260,6 +267,7 @@ function ServiceForm({ initialData, onSubmit, isEdit = false }: ServiceFormProps
         onChange={(e) => setFormData({ ...formData, description: e.target.value })}
         multiline
         rows={3}
+        required
       />
       <TextField
         fullWidth
@@ -276,11 +284,10 @@ function ServiceForm({ initialData, onSubmit, isEdit = false }: ServiceFormProps
         fullWidth
         label="Price per Square Meter"
         type="number"
-        value={formData.price_per_square_meter}
+        value={formData.price_per_square_meter || ''}
         onChange={(e) =>
-          setFormData({ ...formData, price_per_square_meter: Number(e.target.value) })
+          setFormData({ ...formData, price_per_square_meter: e.target.value ? Number(e.target.value) : undefined })
         }
-        required
         InputProps={{
           startAdornment: '$',
           endAdornment: '/m²',
@@ -293,7 +300,6 @@ function ServiceForm({ initialData, onSubmit, isEdit = false }: ServiceFormProps
         onChange={(e) =>
           setFormData({ ...formData, additional_options: e.target.value })
         }
-        required
         multiline
         rows={3}
       />
