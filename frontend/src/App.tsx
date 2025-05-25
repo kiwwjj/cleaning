@@ -1,64 +1,80 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider, CssBaseline } from '@mui/material';
-import { createTheme } from '@mui/material/styles';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from './theme';
+import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Users from './pages/admin/Users';
-import ProtectedRoute from './components/ProtectedRoute';
-
-const theme = createTheme({
-  palette: {
-    mode: 'light',
-    primary: {
-      main: '#1976d2',
-    },
-    secondary: {
-      main: '#dc004e',
-    },
-  },
-  typography: {
-    h1: {
-      fontSize: '2rem',
-      fontWeight: 500,
-    },
-    h2: {
-      fontSize: '1.75rem',
-      fontWeight: 500,
-    },
-    h3: {
-      fontSize: '1.5rem',
-      fontWeight: 500,
-    },
-  },
-});
+import NotFound from './pages/NotFound';
+import { useAuth } from './contexts/AuthContext';
+import { UserRole } from './types';
 
 const queryClient = new QueryClient();
 
+function AppRoutes() {
+  const { user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  // If user is not authenticated, redirect to login except for login and register pages
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <Routes>
+      {/* Public routes - redirect to home if already logged in */}
+      <Route path="/login" element={<Navigate to="/" replace />} />
+      <Route path="/register" element={<Navigate to="/" replace />} />
+
+      {/* Protected routes */}
+      <Route
+        path="/admin/*"
+        element={
+          user.role === UserRole.Admin ? (
+            <Routes>
+              <Route path="users" element={<Users />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          ) : (
+            <Navigate to="/" replace />
+          )
+        }
+      />
+
+      {/* Home route */}
+      <Route path="/" element={<div>Home Page</div>} />
+
+      {/* 404 route */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+}
+
 function App() {
   return (
-    <Router>
-      <QueryClientProvider client={queryClient}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <Router>
           <AuthProvider>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              
-              {/* Admin routes */}
-              <Route element={<ProtectedRoute />}>
-                <Route path="/admin/users" element={<Users />} />
-              </Route>
-
-              {/* Redirect root to login */}
-              <Route path="/" element={<Navigate to="/login" replace />} />
-            </Routes>
+            <Navbar />
+            <AppRoutes />
           </AuthProvider>
-        </ThemeProvider>
-      </QueryClientProvider>
-    </Router>
+        </Router>
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 }
 
