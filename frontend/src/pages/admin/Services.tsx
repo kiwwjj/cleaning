@@ -124,6 +124,7 @@ export default function Services() {
           <Table>
             <TableHead>
               <TableRow>
+                <TableCell>ID</TableCell>
                 <TableCell>Name</TableCell>
                 <TableCell>Description</TableCell>
                 <TableCell>Price</TableCell>
@@ -135,6 +136,7 @@ export default function Services() {
             <TableBody>
               {services.map((service) => (
                 <TableRow key={service.id}>
+                  <TableCell>{service.id}</TableCell>
                   <TableCell>{service.name}</TableCell>
                   <TableCell>{service.description}</TableCell>
                   <TableCell>${service.price}</TableCell>
