@@ -7,6 +7,8 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
+  console.log(user, user.role, user.role === UserRole.Admin, UserRole.Admin);
+
   return (
     <AppBar position="static">
       <Toolbar>
@@ -17,9 +19,14 @@ export default function Navbar() {
           {user ? (
             <>
               {user.role === UserRole.Admin && (
-                <Button color="inherit" onClick={() => navigate('/admin/users')}>
-                  Users
-                </Button>
+                <>
+                  <Button color="inherit" onClick={() => navigate('/admin/users')}>
+                    Users
+                  </Button>
+                  <Button color="inherit" onClick={() => navigate('/admin/services')}>
+                    Services
+                  </Button>
+                </>
               )}
               <Button color="inherit" onClick={logout}>
                 Logout

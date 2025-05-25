@@ -8,6 +8,7 @@ import Navbar from './components/Navbar';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Users from './pages/admin/Users';
+import Services from './pages/admin/Services';
 import NotFound from './pages/NotFound';
 import { useAuth } from './contexts/AuthContext';
 import { UserRole } from './types';
@@ -45,6 +46,7 @@ function AppRoutes() {
           user.role === UserRole.Admin ? (
             <Routes>
               <Route path="users" element={<Users />} />
+              <Route path="services" element={<Services />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           ) : (
