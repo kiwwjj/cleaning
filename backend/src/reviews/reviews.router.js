@@ -10,7 +10,6 @@ export const router = express.Router()
 const reviewsController = new ReviewsController();
 
 const createReviewValidationSchema = Joi.object({
-  user_id: Joi.number().required(),
   service_id: Joi.number().required(),
   rating: Joi.number().min(1).max(5).required(),
   comment: Joi.string().required()

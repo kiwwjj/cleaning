@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import Users from './pages/admin/Users';
 import Services from './pages/admin/Services';
 import Orders from './pages/admin/Orders';
+import Reviews from './pages/admin/Reviews';
 import NotFound from './pages/NotFound';
 import { useAuth } from './contexts/AuthContext';
 import { UserRole } from './types';
@@ -49,6 +50,7 @@ function AppRoutes() {
               <Route path="users" element={<Users />} />
               <Route path="services" element={<Services />} />
               <Route path="orders" element={<Orders />} />
+              <Route path="reviews" element={<Reviews />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           ) : (

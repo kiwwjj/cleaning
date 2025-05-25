@@ -53,4 +53,28 @@ export interface CreateOrderInput {
   squares?: number;
 }
 
-export interface UpdateOrderInput extends Partial<CreateOrderInput> {} 
+export interface UpdateOrderInput extends Partial<CreateOrderInput> {}
+
+export interface Review {
+  id: number;
+  user_id: number;
+  service_id: number;
+  rating: number;
+  comment: string;
+  User?: {
+    id: number;
+    name: string;
+  };
+  Service?: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface CreateReviewInput {
+  service_id: number;
+  rating: number;
+  comment: string;
+}
+
+export interface UpdateReviewInput extends Partial<CreateReviewInput> {} 

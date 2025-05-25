@@ -36,6 +36,7 @@ export class ReviewsController {
   
       const createdReview = await this.reviewsService.create({
         ...request.body,
+        user_id: request.user.id,
         rating: parsedRating,
       })
   
