@@ -27,4 +27,30 @@ export interface CreateServiceInput {
   additional_options: string;
 }
 
-export interface UpdateServiceInput extends Partial<CreateServiceInput> {} 
+export interface UpdateServiceInput extends Partial<CreateServiceInput> {}
+
+export interface Order {
+  id: number;
+  user_id: number;
+  service_id: number;
+  order_date: string;
+  status: string;
+  totalPrice: number;
+  User?: {
+    id: number;
+    name: string;
+  };
+  Service?: {
+    id: number;
+    name: string;
+  };
+}
+
+export interface CreateOrderInput {
+  service_id: number;
+  order_date: string;
+  status: string;
+  squares?: number;
+}
+
+export interface UpdateOrderInput extends Partial<CreateOrderInput> {} 

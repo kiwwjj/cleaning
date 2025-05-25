@@ -26,6 +26,9 @@ export default function Navbar() {
                   <Button color="inherit" onClick={() => navigate('/admin/services')}>
                     Services
                   </Button>
+                  <Button color="inherit" onClick={() => navigate('/admin/orders')}>
+                    Orders
+                  </Button>
                 </>
               )}
               <Button color="inherit" onClick={logout}>
