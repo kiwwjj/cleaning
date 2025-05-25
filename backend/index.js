@@ -6,6 +6,7 @@ import swaggerDocument from './swagger.json' with {type: 'json'}
 import mongoose from 'mongoose';
 import morgan from 'morgan';
 import crypto from 'crypto'
+import cors from 'cors'
 
 import { sequelize } from './src/sequilize.js'
 
@@ -21,16 +22,15 @@ import { validateRole } from './src/middlewares/validate-role.middleware.js';
 dotenv.config();
 
 export const app = express()
-const port = 3000
+const port = process.env.PORT || 3000
 
-const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/logs';
-
-// mongoose.connect(mongoUri, {
-//   useNewUrlParser: true,
-//   useUnifiedTopology: true,
-// })
-//   .then(() => console.log('Connected to MongoDB for logging.'))
-//   .catch(err => console.error('Error connecting to MongoDB:', err));
+// CORS configuration
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 morgan.token('response-time-ms', (req, res) => {
   const diff = process.hrtime(req._startAt);
@@ -51,7 +51,6 @@ app.use(morgan((tokens, req, res) => {
   return JSON.stringify(log); // Optionally log to console
 }));
 
-
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(express.json());
 
@@ -66,7 +65,7 @@ app.use((req, res, next) => {
         .split('.');
     
     let signature = crypto
-        .createHmac('SHA256', process.env.ACCESS_TOKEN_SECRET)
+        .createHmac('SHA256', process.env.JWT_SECRET)
         .update(`${tokenParts[0]}.${tokenParts[1]}`)
         .digest('base64');
 
@@ -93,16 +92,20 @@ app.use('/services', servicesRouter)
 app.listen(port, async () => {
   try {
     initializeRelations()
-    sequelize.authenticate()
-      .then(() => console.log('Database connected successfully.'))
-      .catch(err => console.error('Unable to connect to the database:', err));
+    await sequelize.authenticate()
+    console.log('Database connected successfully.');
 
-    await sequelize.sync({ force: false }); // force: true пересоздаст таблицы
-
+    await sequelize.sync({ force: false });
     console.log('Models synchronized with the database.');
+
+    if (process.env.MONGO_URI) {
+      await mongoose.connect(process.env.MONGO_URI);
+      console.log('Connected to MongoDB for logging.');
+    }
   } catch (error) {
-    console.error('Error connecting to the database:', error);
+    console.error('Error during startup:', error);
+    process.exit(1);
   }
 
-  console.log(`Example app listening on port ${port}`)
-})
+  console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${port}`);
+});
