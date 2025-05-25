@@ -11,6 +11,9 @@ import Users from './pages/admin/Users';
 import Services from './pages/admin/Services';
 import Orders from './pages/admin/Orders';
 import Reviews from './pages/admin/Reviews';
+import ClientServices from './pages/client/Services';
+import ClientOrders from './pages/client/Orders';
+import ClientReviews from './pages/client/Reviews';
 import NotFound from './pages/NotFound';
 import { useAuth } from './contexts/AuthContext';
 import { UserRole } from './types';
@@ -41,7 +44,7 @@ function AppRoutes() {
       <Route path="/login" element={<Navigate to="/" replace />} />
       <Route path="/register" element={<Navigate to="/" replace />} />
 
-      {/* Protected routes */}
+      {/* Admin routes */}
       <Route
         path="/admin/*"
         element={
@@ -59,8 +62,13 @@ function AppRoutes() {
         }
       />
 
+      {/* Client routes */}
+      <Route path="/services" element={<ClientServices />} />
+      <Route path="/orders" element={<ClientOrders />} />
+      <Route path="/reviews" element={<ClientReviews />} />
+
       {/* Home route */}
-      <Route path="/" element={<div>Home Page</div>} />
+      <Route path="/" element={<Navigate to="/services" replace />} />
 
       {/* 404 route */}
       <Route path="*" element={<NotFound />} />

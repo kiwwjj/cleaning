@@ -7,7 +7,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
-  console.log(user, user.role, user.role === UserRole.Admin, UserRole.Admin);
+  if (!user) return null;
 
   return (
     <AppBar position="static">
@@ -15,39 +15,38 @@ export default function Navbar() {
         <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
           Cleaning Service
         </Typography>
-        <Box>
-          {user ? (
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          {user.role === UserRole.Admin ? (
             <>
-              {user.role === UserRole.Admin && (
-                <>
-                  <Button color="inherit" onClick={() => navigate('/admin/users')}>
-                    Users
-                  </Button>
-                  <Button color="inherit" onClick={() => navigate('/admin/services')}>
-                    Services
-                  </Button>
-                  <Button color="inherit" onClick={() => navigate('/admin/orders')}>
-                    Orders
-                  </Button>
-                  <Button color="inherit" onClick={() => navigate('/admin/reviews')}>
-                    Reviews
-                  </Button>
-                </>
-              )}
-              <Button color="inherit" onClick={logout}>
-                Logout
+              <Button color="inherit" onClick={() => navigate('/admin/users')}>
+                Users
+              </Button>
+              <Button color="inherit" onClick={() => navigate('/admin/services')}>
+                Services
+              </Button>
+              <Button color="inherit" onClick={() => navigate('/admin/orders')}>
+                Orders
+              </Button>
+              <Button color="inherit" onClick={() => navigate('/admin/reviews')}>
+                Reviews
               </Button>
             </>
           ) : (
             <>
-              <Button color="inherit" onClick={() => navigate('/login')}>
-                Login
+              <Button color="inherit" onClick={() => navigate('/services')}>
+                Services
               </Button>
-              <Button color="inherit" onClick={() => navigate('/register')}>
-                Register
+              <Button color="inherit" onClick={() => navigate('/orders')}>
+                My Orders
+              </Button>
+              <Button color="inherit" onClick={() => navigate('/reviews')}>
+                Reviews
               </Button>
             </>
           )}
+          <Button color="inherit" onClick={logout}>
+            Logout
+          </Button>
         </Box>
       </Toolbar>
     </AppBar>
