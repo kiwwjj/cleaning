@@ -26,6 +26,7 @@ export default function Register() {
     try {
       await register(name, email, password);
     } catch (error) {
+      console.log(error);
       setError('Registration failed. Please try again.');
     }
   };

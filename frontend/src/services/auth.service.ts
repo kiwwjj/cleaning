@@ -1,59 +1,68 @@
+import { jwtDecode } from 'jwt-decode';
+import type { User } from '../types';
+import { UserRole } from '../types';
 import api from './api';
 
-export interface LoginCredentials {
+interface DecodedToken {
   email: string;
-  password: string;
+  id: string;
+  role: UserRole;
+  exp: number;
+  iat: number;
 }
 
-export interface RegisterData extends LoginCredentials {
-  name: string;
-}
-
-export interface AuthResponse {
-  token: string;
-  user: {
-    id: string;
-    name: string;
-    email: string;
-    role: string;
-  };
-}
-
-const TOKEN_KEY = 'auth_token';
-const USER_KEY = 'auth_user';
-
-const authService = {
-  async login(credentials: LoginCredentials): Promise<AuthResponse> {
+export const authService = {
+  async login(credentials: { email: string; password: string }): Promise<{ user: User }> {
     const response = await api.post('/auth/login', credentials);
-    if (response.data.token) {
-      localStorage.setItem(TOKEN_KEY, response.data.token);
-      localStorage.setItem(USER_KEY, JSON.stringify(response.data.user));
+
+    if (!response.data.accessToken) {
+      throw new Error('Login failed');
     }
-    return response.data;
+
+    localStorage.setItem('token', response.data.accessToken);
+
+    // Decode token to get user info
+    const decodedToken = jwtDecode<DecodedToken>(response.data.accessToken);
+    const user: User = {
+      id: decodedToken.id,
+      email: decodedToken.email,
+      name: '', // We don't have name in token, might need to fetch it separately
+      role: decodedToken.role
+    };
+
+    return { user };
   },
 
-  async register(data: RegisterData): Promise<AuthResponse> {
+  async register(data: { name: string; email: string; password: string }): Promise<{ user: User }> {
     const response = await api.post('/auth/register', data);
-    if (response.data.token) {
-      localStorage.setItem(TOKEN_KEY, response.data.token);
-      localStorage.setItem(USER_KEY, JSON.stringify(response.data.user));
+
+    if (!response.data) {
+      throw new Error('Registration failed');
     }
-    return response.data;
+
+    // After registration, we need to login to get the token
+    return this.login({ email: data.email, password: data.password });
   },
 
-  logout(): void {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(USER_KEY);
+  async logout(): Promise<void> {
+    localStorage.removeItem('token');
   },
 
   getCurrentToken(): string | null {
-    return localStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem('token');
   },
 
-  getCurrentUser(): AuthResponse['user'] | null {
-    const userStr = localStorage.getItem(USER_KEY);
-    return userStr ? JSON.parse(userStr) : null;
-  }
-};
+  isAuthenticated(): boolean {
+    const token = this.getCurrentToken();
+    if (!token) return false;
 
-export default authService; 
+    try {
+      const decodedToken = jwtDecode<DecodedToken>(token);
+      // Check if token is expired
+      const currentTime = Date.now() / 1000;
+      return decodedToken.exp > currentTime;
+    } catch {
+      return false;
+    }
+  }
+}; 

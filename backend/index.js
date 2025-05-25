@@ -98,10 +98,10 @@ app.listen(port, async () => {
     await sequelize.sync({ force: false });
     console.log('Models synchronized with the database.');
 
-    if (process.env.MONGO_URI) {
-      await mongoose.connect(process.env.MONGO_URI);
-      console.log('Connected to MongoDB for logging.');
-    }
+    // if (process.env.MONGO_URI) {
+    //   await mongoose.connect(process.env.MONGO_URI);
+    //   console.log('Connected to MongoDB for logging.');
+    // }
   } catch (error) {
     console.error('Error during startup:', error);
     process.exit(1);

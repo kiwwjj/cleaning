@@ -1,56 +1,50 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
-import authService from '../services/auth.service';
-import type { AuthResponse } from '../services/auth.service';
+import type { User } from '../types';
+import { UserRole } from '../types';
+import { authService } from '../services/auth.service';
 
 interface AuthContextType {
-  user: AuthResponse['user'] | null;
+  user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthResponse['user'] | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const token = authService.getCurrentToken();
-    if (token) {
-      // TODO: Implement token validation and user data fetching
-      // For now, we'll just check if token exists
-      setUser({ id: '1', name: 'User', email: 'user@example.com', role: 'User' });
-    }
-  }, []);
-
   const login = async (email: string, password: string) => {
-    try {
-      const response = await authService.login({ email, password });
-      setUser(response.user);
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
+    const response = await authService.login({ email, password });
+    const user = response.user;
+    setUser(user);
+    
+    if (user.role === UserRole.Admin) {
+      navigate('/admin/users');
+    } else {
+      navigate('/');
     }
   };
 
   const register = async (name: string, email: string, password: string) => {
-    try {
-      const response = await authService.register({ name, email, password });
-      setUser(response.user);
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Registration failed:', error);
-      throw error;
+    const response = await authService.register({ name, email, password });
+    const user = response.user;
+    setUser(user);
+    
+    if (user.role === UserRole.Admin) {
+      navigate('/admin/users');
+    } else {
+      navigate('/');
     }
   };
 
-  const logout = () => {
-    authService.logout();
+  const logout = async () => {
+    await authService.logout();
     setUser(null);
     navigate('/login');
   };
