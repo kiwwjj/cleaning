@@ -12,16 +12,16 @@ import { DbLog } from './logger/db-log.model.js';
 
 export const sequelize = new Sequelize(`postgres://${dbUser}:${dbPassword}@${dbHost}:${dbPort}/${dbName}`, {
   database: dbName,
-  logging: async (sql) => {
-    try {
-      await DbLog.create({
-        operation: 'query',
-        model: 'global', 
-        data: sql, 
-        success: true,
-      });
-    } catch (err) {
-      console.error('Failed to log SQL query:', err);
-    }
-  },
+  // logging: async (sql) => {
+  //   try {
+  //     await DbLog.create({
+  //       operation: 'query',
+  //       model: 'global', 
+  //       data: sql, 
+  //       success: true,
+  //     });
+  //   } catch (err) {
+  //     console.error('Failed to log SQL query:', err);
+  //   }
+  // },
 });
