@@ -16,7 +16,11 @@ cleaning-service/
 │   │   └── ...
 │   ├── index.js      # Main application file
 │   └── package.json  # Backend dependencies
-└── package.json      # Root package.json for workspace management
+├── frontend/         # React frontend application
+│   ├── src/         # Source code
+│   ├── public/      # Static files
+│   └── package.json # Frontend dependencies
+└── package.json     # Root package.json for workspace management
 ```
 
 ## Getting Started
@@ -41,10 +45,31 @@ cleaning-service/
    ACCESS_TOKEN_SECRET=your_jwt_secret
    ```
 
-3. Start the development server:
+3. Start the development servers:
    ```bash
-   npm run start:dev
+   # Start both frontend and backend
+   npm run dev
+   
+   # Or start them separately
+   npm run start:dev  # Backend only
+   npm run frontend   # Frontend only
    ```
+
+## Frontend Features
+
+- React with TypeScript
+- Material-UI for components
+- React Router for navigation
+- React Query for data fetching
+- Axios for API communication
+
+## Backend Features
+
+- Express.js REST API
+- JWT Authentication
+- PostgreSQL database with Sequelize ORM
+- MongoDB for logging
+- Swagger API documentation
 
 ## API Documentation
 
@@ -52,6 +77,8 @@ API documentation is available at `/docs` endpoint when the server is running.
 
 ## Available Scripts
 
-- `npm start` - Start the production server
-- `npm run start:dev` - Start the development server with hot reload
-- `npm test` - Run tests 
+- `npm start` - Start the production backend server
+- `npm run start:dev` - Start the development backend server
+- `npm run frontend` - Start the frontend development server
+- `npm run dev` - Start both frontend and backend development servers
+- `npm test` - Run backend tests 
